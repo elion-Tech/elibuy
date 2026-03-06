@@ -1,0 +1,5 @@
+{
+  "name": "Elibuy",
+  "description": "A comprehensive e-commerce platform with multi-role dashboards for Admins, Vendors, Shoppers, and Logistics.",
+  "requestFramePermissions": []
+}
