@@ -20,6 +20,30 @@ const VendorProducts = () => {
       });
   }, [user?.id]);
 
+  const handleDelete = async (productId: string) => {
+    if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await apiFetch(`/api/products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setProducts(products.filter(p => p.id !== productId));
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error || 'Failed to delete product.'}`);
+      }
+    } catch (error) {
+      alert('An unexpected error occurred while deleting the product.');
+    }
+  };
+
   if (loading) return <div className="p-10 text-center">Loading products...</div>;
 
   return (
@@ -88,10 +112,14 @@ const VendorProducts = () => {
                   </td>
                   <td className="py-4 px-6 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 text-gray-400 hover:text-indigo-600 transition-colors">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                      <Link to={`/dashboard/products/edit/${product.id}`} className="p-2 text-gray-400 hover:text-indigo-600 transition-colors">
+                          <Edit className="w-4 h-4" />
+                      </Link>
+                      <button 
+                        onClick={() => handleDelete(product.id)}
+                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                        aria-label={`Delete ${product.name}`}
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
