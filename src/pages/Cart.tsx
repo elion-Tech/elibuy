@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck } from 'lucide-react';
+import { Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck, Plus, Minus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePaystackPayment } from 'react-paystack';
 import { apiFetch } from '../utils/api';
 
 const Cart = () => {
-  const { items, removeFromCart, total, clearCart } = useCart();
+  const { items, removeFromCart, updateQuantity, total, clearCart } = useCart();
   const { user, token } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -131,7 +131,18 @@ const Cart = () => {
               />
               <div className="flex-1 space-y-1">
                 <h3 className="font-bold text-gray-900">{item.name}</h3>
-                <p className="text-sm text-gray-400">Quantity: {item.quantity}</p>
+                <div className="flex items-center gap-3">
+                  <p className="text-sm text-gray-500">Quantity:</p>
+                  <div className="flex items-center gap-2 border border-gray-200 rounded-full">
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1.5 text-gray-400 hover:text-indigo-600">
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-sm font-bold w-4 text-center">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1.5 text-gray-400 hover:text-indigo-600">
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
                 <p className="text-indigo-600 font-bold">₦{item.price.toLocaleString()}</p>
               </div>
               <button 

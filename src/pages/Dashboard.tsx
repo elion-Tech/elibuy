@@ -79,7 +79,7 @@ const Dashboard = () => {
             <h3 className="text-xl font-bold">Recent Orders</h3>
             <button className="text-indigo-600 text-sm font-bold hover:underline">View All</button>
           </div>
-          <OrderTable orders={orders} />
+          <OrderTable orders={orders} setOrders={setOrders} />
         </div>
         <div className="bg-indigo-600 rounded-3xl p-8 text-white relative overflow-hidden">
           <div className="relative z-10 space-y-4">
@@ -110,7 +110,7 @@ const Dashboard = () => {
 
       <div className="bg-white rounded-3xl border border-gray-100 p-8">
         <h3 className="text-xl font-bold mb-6">My Order History</h3>
-        <OrderTable orders={orders} />
+        <OrderTable orders={orders} setOrders={setOrders} />
       </div>
     </div>
   );
@@ -124,7 +124,7 @@ const Dashboard = () => {
 
       <div className="bg-white rounded-3xl border border-gray-100 p-8">
         <h3 className="text-xl font-bold mb-6">Active Deliveries</h3>
-        <OrderTable orders={orders} isLogistics />
+        <OrderTable orders={orders} setOrders={setOrders} isLogistics />
       </div>
     </div>
   );
@@ -156,10 +156,10 @@ const StatCard = ({ icon: Icon, label, value, color }: any) => (
   </div>
 );
 
-const OrderTable = ({ orders, isLogistics }: { orders: any[], isLogistics?: boolean }) => {
+const OrderTable = ({ orders, setOrders, isLogistics }: { orders: any[], setOrders: React.Dispatch<React.SetStateAction<any[]>>, isLogistics?: boolean }) => {
   const { token } = useAuth();
   
-  const updateStatus = async (id: number, status: string) => {
+  const updateStatus = async (id: string, status: string) => {
     await apiFetch(`/api/orders/${id}/status`, {
       method: 'PATCH',
       headers: { 
@@ -168,7 +168,9 @@ const OrderTable = ({ orders, isLogistics }: { orders: any[], isLogistics?: bool
       },
       body: JSON.stringify({ status })
     });
-    window.location.reload();
+    setOrders(prevOrders => prevOrders.map(order => 
+      order.id === id ? { ...order, status: status } : order
+    ));
   };
 
   return (
@@ -217,7 +219,7 @@ const OrderTable = ({ orders, isLogistics }: { orders: any[], isLogistics?: bool
           ))}
           {orders.length === 0 && (
             <tr>
-              <td colSpan={5} className="py-10 text-center text-gray-400 italic">No orders found</td>
+              <td colSpan={isLogistics ? 5 : 4} className="py-10 text-center text-gray-400 italic">No orders found</td>
             </tr>
           )}
         </tbody>

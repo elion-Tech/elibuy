@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { Navbar } from './components/Navbar';
@@ -11,7 +11,10 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Cart from './pages/Cart';
 import Dashboard from './pages/Dashboard';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import AddProduct from './pages/AddProduct';
+import EditProduct from './pages/EditProduct';
 import VendorProducts from './pages/VendorProducts';
 
 const ProtectedRoute = ({ children, roles }: { children: React.ReactNode, roles?: string[] }) => {
@@ -26,8 +29,8 @@ const ProtectedRoute = ({ children, roles }: { children: React.ReactNode, roles?
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
-  const isDashboard = window.location.pathname.startsWith('/dashboard');
-
+  const location = useLocation();
+  const isDashboard = location.pathname.startsWith('/dashboard');
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
@@ -53,6 +56,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password/:token" element={<ResetPassword />} />
               <Route path="/cart" element={<Cart />} />
               
               <Route path="/dashboard" element={
@@ -70,6 +75,12 @@ function App() {
               <Route path="/dashboard/products/add" element={
                 <ProtectedRoute roles={['VENDOR', 'ADMIN']}>
                   <AddProduct />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/dashboard/products/edit/:id" element={
+                <ProtectedRoute roles={['VENDOR', 'ADMIN']}>
+                  <EditProduct />
                 </ProtectedRoute>
               } />
               

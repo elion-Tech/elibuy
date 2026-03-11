@@ -30,15 +30,8 @@ const Signup = () => {
       const data = await res.json();
       
       if (res.ok) {
-        // Automatically login after signup
-        const loginRes = await apiFetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: formData.email, password: formData.password }),
-        });
-        const loginData = await loginRes.json();
-        login(loginData.token, loginData.user);
-        navigate('/dashboard');
+        login(data.token, data.user);
+        navigate(data.user.role === 'SHOPPER' ? '/' : '/dashboard');
       } else {
         setError(data.error);
       }
