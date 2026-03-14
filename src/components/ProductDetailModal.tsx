@@ -1,11 +1,13 @@
 import React from 'react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { X, ShoppingCart, CreditCard, Tag, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 
 const ProductDetailModal = ({ product, onClose }: { product: any, onClose: () => void }) => {
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const handleBuyNow = (product: any) => {
@@ -14,6 +16,8 @@ const ProductDetailModal = ({ product, onClose }: { product: any, onClose: () =>
   };
 
   if (!product) return null;
+
+  const canShop = !user || user.role === 'SHOPPER';
 
   return (
     <motion.div
@@ -66,7 +70,8 @@ const ProductDetailModal = ({ product, onClose }: { product: any, onClose: () =>
 
           <div className="text-sm font-medium text-gray-500">{product.stock} units in stock</div>
 
-          <div className="grid grid-cols-2 gap-4 pt-4">
+          {canShop && (
+            <div className="grid grid-cols-2 gap-4 pt-4">
             <button
               onClick={() => addToCart(product)}
               className="flex items-center justify-center gap-2 py-3.5 rounded-xl border border-indigo-100 text-indigo-600 font-bold hover:bg-indigo-50 transition-all"
@@ -82,6 +87,7 @@ const ProductDetailModal = ({ product, onClose }: { product: any, onClose: () =>
               Buy Now
             </button>
           </div>
+          )}
         </div>
       </motion.div>
     </motion.div>

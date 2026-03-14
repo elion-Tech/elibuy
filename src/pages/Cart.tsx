@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+do sameimport React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck, Plus, Minus } from 'lucide-react';
@@ -14,8 +14,7 @@ const Cart = () => {
   const [shippingDetails, setShippingDetails] = useState({
     state: '',
     lga: '',
-    streetAddress: '',
-
+    streetAddress: ''
   });
 
   const config = {
@@ -27,7 +26,8 @@ const Cart = () => {
   const [shippingCost, setShippingCost] = useState(0);
   const [loadingShippingCost, setLoadingShippingCost] = useState(false);
   useEffect(() => {
-    calculateShipping();
+    // Debounce or only calculate if state/lga are present to avoid initial empty calls
+    if (shippingDetails.state && shippingDetails.lga) calculateShipping();
   }, [shippingDetails]);
 
   const initializePayment = usePaystackPayment(config);
@@ -122,6 +122,7 @@ const Cart = () => {
         body: JSON.stringify({
           state: shippingDetails.state,
           lga: shippingDetails.lga,
+          items: items.map(item => ({ product_id: item.id, ...item })) // Send items for free shipping check
         }),
       });
       const data = await res.json();
@@ -212,7 +213,7 @@ const Cart = () => {
 
              <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700 px-1">Street Address</label>
-              <input type="text" required value={shippingDetails.streetAddress} onChange={(e) => setShippingDetails({ ...shippingDetails, streetAddress: e.target.value })} className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" placeholder="Enter street address" />
+              <input type="text" required value={shippingDetails.streetAddress} onChange={(e) => setShippingDetails({...shippingDetails, streetAddress: e.target.value})} className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" placeholder="Enter street address" />
             </div>
         </div>
         </div>

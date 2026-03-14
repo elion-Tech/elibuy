@@ -66,6 +66,30 @@ function App() {
                 </ProtectedRoute>
               } />
 
+              <Route path="/dashboard/users" element={
+                <ProtectedRoute roles={['ADMIN']}>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/dashboard/deliveries" element={
+                <ProtectedRoute roles={['LOGISTICS', 'ADMIN']}>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/dashboard/orders" element={
+                <ProtectedRoute roles={['VENDOR', 'ADMIN']}>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/dashboard/analytics" element={
+                <ProtectedRoute roles={['VENDOR', 'ADMIN']}>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+
               <Route path="/dashboard/products" element={
                 <ProtectedRoute roles={['VENDOR', 'ADMIN']}>
                   <VendorProducts />

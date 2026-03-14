@@ -1,77 +1,72 @@
 import React from 'react';
-import { 
-  LayoutDashboard, 
-  Package, 
-  ShoppingCart, 
-  Users, 
-  Truck, 
-  Settings, 
-  PlusCircle,
-  BarChart3,
-  ClipboardList,
-  Store
-} from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import { LayoutDashboard, Package, PlusCircle, ShoppingBag, BarChart2, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { cn } from '../utils/cn';
+import { useNavigate } from 'react-router-dom';
+import { Users, Truck } from 'lucide-react';
 
 export const Sidebar = () => {
-  const { user } = useAuth();
-  const location = useLocation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   if (!user) return null;
 
-  const menuItems = {
-    ADMIN: [
-      { icon: LayoutDashboard, label: 'Overview', path: '/dashboard' },
-      { icon: Users, label: 'Users', path: '/dashboard/users' },
-      { icon: Store, label: 'Vendors', path: '/dashboard/vendors' },
-      { icon: ShoppingCart, label: 'All Orders', path: '/dashboard/orders' },
-      { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
-    ],
-    VENDOR: [
-      { icon: LayoutDashboard, label: 'Overview', path: '/dashboard' },
-      { icon: Package, label: 'My Products', path: '/dashboard/products' },
-      { icon: PlusCircle, label: 'Add Product', path: '/dashboard/products/add' },
-      { icon: ClipboardList, label: 'Orders', path: '/dashboard/orders' },
-      { icon: BarChart3, label: 'Analytics', path: '/dashboard/analytics' },
-    ],
-    SHOPPER: [
-      { icon: LayoutDashboard, label: 'My Account', path: '/dashboard' },
-      { icon: ShoppingCart, label: 'Order History', path: '/dashboard/orders' },
-      { icon: Settings, label: 'Profile Settings', path: '/dashboard/settings' },
-    ],
-    LOGISTICS: [
-      { icon: LayoutDashboard, label: 'Overview', path: '/dashboard' },
-      { icon: Truck, label: 'Deliveries', path: '/dashboard/deliveries' },
-      { icon: ClipboardList, label: 'History', path: '/dashboard/history' },
-    ],
-  };
+  let links: { to: string; icon: any; label: string }[] = [];
 
-  const currentMenu = menuItems[user.role] || [];
+  switch (user.role) {
+    case 'VENDOR':
+      links = [
+        { to: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
+        { to: '/dashboard/products', icon: Package, label: 'My Products' },
+        { to: '/dashboard/products/add', icon: PlusCircle, label: 'Add Product' },
+        { to: '/dashboard/orders', icon: ShoppingBag, label: 'Orders' },
+        { to: '/dashboard/analytics', icon: BarChart2, label: 'Analytics' },
+      ];
+      break;
+    case 'ADMIN':
+      links = [
+        { to: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
+        { to: '/dashboard/users', icon: Users, label: 'Users' },
+        { to: '/dashboard/products', icon: Package, label: 'All Products' },
+        { to: '/dashboard/orders', icon: ShoppingBag, label: 'All Orders' },
+        { to: '/dashboard/analytics', icon: BarChart2, label: 'Analytics' },
+      ];
+      break;
+    case 'LOGISTICS':
+      links = [
+        { to: '/dashboard', icon: LayoutDashboard, label: 'Overview' },
+        { to: '/dashboard/deliveries', icon: Truck, label: 'Deliveries' },
+      ];
+      break;
+    case 'SHOPPER':
+      links = [
+        { to: '/dashboard', icon: LayoutDashboard, label: 'My Dashboard' },
+        { to: '/dashboard/orders', icon: ShoppingBag, label: 'My Orders' },
+      ];
+      break;
+  }
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-100 h-[calc(100vh-64px)] sticky top-16 hidden md:block">
-      <div className="p-6 space-y-1">
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 px-3">Main Menu</p>
-        {currentMenu.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group",
-              location.pathname === item.path 
-                ? "bg-indigo-50 text-indigo-600 shadow-sm shadow-indigo-100/50" 
-                : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-            )}
-          >
-            <item.icon className={cn(
-              "w-4 h-4 transition-colors",
-              location.pathname === item.path ? "text-indigo-600" : "text-gray-400 group-hover:text-gray-600"
-            )} />
-            {item.label}
-          </Link>
-        ))}
+    <aside className="w-64 bg-white border-r border-gray-100 hidden md:flex flex-col">
+      <div className="p-6">
+        <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">{user.role} Menu</h2>
+        <nav className="space-y-2">
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end={link.to === '/dashboard'}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                  isActive ? 'bg-indigo-50 text-indigo-600' : 'text-gray-600 hover:bg-gray-50'
+                }`
+              }
+            >
+              <link.icon className="w-5 h-5" />
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
       </div>
     </aside>
   );

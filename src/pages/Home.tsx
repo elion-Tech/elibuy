@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { ShoppingCart, Star, Tag, CreditCard } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +13,7 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const { addToCart } = useCart();
   const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -52,10 +54,8 @@ const Home = () => {
     }
   }, [selectedCategory, products]);
 
-  const handleBuyNow = (product: any) => {
-    addToCart(product);
-    navigate('/cart');
-  };
+  // Helper to check if user can shop
+  const canShop = !user || user.role === 'SHOPPER';
 
   if (loading) return <div className="flex justify-center p-20">Loading products...</div>;
 
@@ -81,12 +81,14 @@ const Home = () => {
           <span className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-widest">New Collection 2026</span>
           <h1 className="text-4xl md:text-6xl font-bold leading-tight">Upgrade Your Lifestyle with Elibuy</h1>
           <p className="text-indigo-100 text-lg">Discover premium products from verified vendors across the globe. Fast delivery, secure payments.</p>
-          <button 
+          {canShop && (
+            <button 
             onClick={() => document.getElementById('products-section')?.scrollIntoView({ behavior: 'smooth' })}
             className="bg-white text-indigo-600 px-8 py-4 rounded-full font-bold hover:bg-indigo-50 transition-all shadow-lg shadow-indigo-900/20"
           >
             Shop Now
           </button>
+          )}
         </div>
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-indigo-500/20 to-transparent pointer-events-none" />
       </div>
