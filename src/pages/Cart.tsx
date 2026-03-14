@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck, Plus, Minus } from 'lucide-react';
@@ -17,14 +17,16 @@ const Cart = () => {
     streetAddress: ''
   });
 
-  const config = {
-    reference: (new Date()).getTime().toString(),
-    email: user?.email || '',
-    amount: total * 100, // Paystack expects amount in kobo
-    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_your_public_key',
-  };
   const [shippingCost, setShippingCost] = useState(0);
   const [loadingShippingCost, setLoadingShippingCost] = useState(false);
+
+  const config = useMemo(() => ({
+    reference: (new Date()).getTime().toString(),
+    email: user?.email || '',
+    amount: (total + shippingCost) * 100, // Paystack expects amount in kobo
+    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_your_public_key',
+  }), [user, total, shippingCost]);
+
   useEffect(() => {
     // Debounce or only calculate if state/lga are present to avoid initial empty calls
     if (shippingDetails.state && shippingDetails.lga) calculateShipping();
@@ -198,7 +200,7 @@ const Cart = () => {
         </div>
       </div>
 
-       <div className="space-y-6">
+      <div className="lg:col-span-1 space-y-6">
         <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
           <h3 className="text-xl font-bold text-gray-900">Shipping Details</h3>
            <div className="space-y-2">
@@ -216,18 +218,11 @@ const Cart = () => {
               <input type="text" required value={shippingDetails.streetAddress} onChange={(e) => setShippingDetails({...shippingDetails, streetAddress: e.target.value})} className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" placeholder="Enter street address" />
             </div>
         </div>
-        </div>
 
+        <button onClick={calculateShipping} className="w-full bg-gray-800 text-white py-3 rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-70">
+          {loadingShippingCost ? 'Calculating...' : 'Calculate Shipping'}
+        </button>
 
-
-      <button onClick={calculateShipping} className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2 disabled:opacity-70">
-        {loadingShippingCost ? 'Calculating...' : 'Calculate Shipping'}
-      </button>
-
-
-
-
-      <div className="space-y-6">
         <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
           <h3 className="text-xl font-bold text-gray-900">Order Summary</h3>
           
@@ -248,12 +243,12 @@ const Cart = () => {
 
           <button
             onClick={handleCheckout}
-            disabled={loading}
+            disabled={loading || !shippingDetails.streetAddress}
             className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2 disabled:opacity-70"
           >
             {loading ? 'Processing...' : (
               <>
-                Pay with Paystack
+                Pay ₦{(total + shippingCost).toLocaleString()}
                 <ArrowRight className="w-5 h-5" />
               </>
             )}
@@ -266,7 +261,7 @@ const Cart = () => {
             </div>
             <div className="flex items-center gap-3 text-xs text-gray-400 font-medium">
               <Truck className="w-4 h-4 text-indigo-500" />
-              Free delivery on all orders this week
+              Delivery fees are calculated based on location
             </div>
           </div>
         </div>
