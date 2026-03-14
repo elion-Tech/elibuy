@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck, Plus, Minus } from 'lucide-react';
@@ -11,6 +11,12 @@ const Cart = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [shippingDetails, setShippingDetails] = useState({
+    state: '',
+    lga: '',
+    streetAddress: '',
+
+  });
 
   const config = {
     reference: (new Date()).getTime().toString(),
@@ -18,6 +24,11 @@ const Cart = () => {
     amount: total * 100, // Paystack expects amount in kobo
     publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_your_public_key',
   };
+  const [shippingCost, setShippingCost] = useState(0);
+  const [loadingShippingCost, setLoadingShippingCost] = useState(false);
+  useEffect(() => {
+    calculateShipping();
+  }, [shippingDetails]);
 
   const initializePayment = usePaystackPayment(config);
 
@@ -49,6 +60,7 @@ const Cart = () => {
         body: JSON.stringify({
           items,
           total_amount: total,
+          shippingDetails,
           payment_reference: reference.reference
         })
       });
@@ -80,6 +92,7 @@ const Cart = () => {
       return;
     }
 
+
     const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
     if (!publicKey || publicKey === 'pk_test_your_public_key' || publicKey === '') {
       const proceed = confirm(
@@ -96,6 +109,34 @@ const Cart = () => {
     }
 
     initializePayment({ onSuccess, onClose });
+  };
+
+  const calculateShipping = async () => {
+    setLoadingShippingCost(true);
+    try {
+      const res = await apiFetch('/api/shipping-cost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          state: shippingDetails.state,
+          lga: shippingDetails.lga,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setShippingCost(data.shippingCost);
+      } else {
+        console.error('Failed to calculate shipping cost:', data.error);
+        setShippingCost(0);
+      }
+    } catch (error) {
+      console.error('Error calculating shipping cost:', error);
+      setShippingCost(0);
+    } finally {
+      setLoadingShippingCost(false);
+    }
   };
 
   if (items.length === 0) {
@@ -156,6 +197,35 @@ const Cart = () => {
         </div>
       </div>
 
+       <div className="space-y-6">
+        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+          <h3 className="text-xl font-bold text-gray-900">Shipping Details</h3>
+           <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 px-1">State</label>
+              <input type="text" required value={shippingDetails.state} onChange={(e) => setShippingDetails({...shippingDetails, state: e.target.value})} className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" placeholder="Enter state" />
+            </div>
+
+             <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 px-1">LGA</label>
+              <input type="text" required value={shippingDetails.lga} onChange={(e) => setShippingDetails({...shippingDetails, lga: e.target.value})} className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" placeholder="Enter LGA" />
+            </div>
+
+             <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 px-1">Street Address</label>
+              <input type="text" required value={shippingDetails.streetAddress} onChange={(e) => setShippingDetails({ ...shippingDetails, streetAddress: e.target.value })} className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" placeholder="Enter street address" />
+            </div>
+        </div>
+        </div>
+
+
+
+      <button onClick={calculateShipping} className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2 disabled:opacity-70">
+        {loadingShippingCost ? 'Calculating...' : 'Calculate Shipping'}
+      </button>
+
+
+
+
       <div className="space-y-6">
         <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
           <h3 className="text-xl font-bold text-gray-900">Order Summary</h3>
@@ -167,11 +237,11 @@ const Cart = () => {
             </div>
             <div className="flex justify-between text-gray-500">
               <span>Shipping</span>
-              <span className="text-emerald-600 font-bold">Free</span>
+              <span className="text-emerald-600 font-bold">₦{shippingCost.toLocaleString()}</span>
             </div>
             <div className="border-t border-gray-50 pt-4 flex justify-between text-lg font-bold">
               <span>Total</span>
-              <span className="text-indigo-600">₦{total.toLocaleString()}</span>
+              <span className="text-indigo-600">₦{(total + shippingCost).toLocaleString()}</span>
             </div>
           </div>
 

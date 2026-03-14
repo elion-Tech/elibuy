@@ -158,6 +158,7 @@ const StatCard = ({ icon: Icon, label, value, color }: any) => (
 
 const OrderTable = ({ orders, setOrders, isLogistics }: { orders: any[], setOrders: React.Dispatch<React.SetStateAction<any[]>>, isLogistics?: boolean }) => {
   const { token } = useAuth();
+
   
   const updateStatus = async (id: string, status: string) => {
     await apiFetch(`/api/orders/${id}/status`, {
@@ -182,6 +183,9 @@ const OrderTable = ({ orders, setOrders, isLogistics }: { orders: any[], setOrde
             <th className="pb-4 px-4">Date</th>
             <th className="pb-4 px-4">Amount</th>
             <th className="pb-4 px-4">Status</th>
+               <th className="pb-4 px-4">Shipping Details</th>
+
+
             {isLogistics && <th className="pb-4 px-4">Action</th>}
           </tr>
         </thead>
@@ -200,6 +204,10 @@ const OrderTable = ({ orders, setOrders, isLogistics }: { orders: any[], setOrde
                 }`}>
                   {order.status}
                 </span>
+              </td>
+
+              <td className="py-4 px-4 text-sm text-gray-500">
+                {order.shippingDetails?.streetAddress}, {order.shippingDetails?.lga}, {order.shippingDetails?.state}
               </td>
               {isLogistics && (
                 <td className="py-4 px-4">
