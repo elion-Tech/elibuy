@@ -2,19 +2,29 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Run and deploy your AI Studio app
+# Elibuy - Frontend (Vite + React)
 
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/dfdfb58c-51d0-466a-a5cd-ba1e86f98f88
+This is the frontend for the Elibuy e-commerce platform, built with Vite, React, and Tailwind CSS.
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+**Prerequisites:**
+*   Node.js (v18 or higher recommended)
+*   A running instance of the `elibuy-server` backend.
 
+### Setup
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
+
+2. Create a `.env` file in this directory (`elibuy/`) and add the following environment variables:
+   ```
+   # The URL of your running backend server
+   VITE_API_URL=http://localhost:3000
+
+   # Your public key from the Paystack dashboard
+   VITE_PAYSTACK_PUBLIC_KEY=pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   ```
+
+3. Run the development server:
    `npm run dev`
