@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Package, DollarSign, Image as ImageIcon, Tag, Loader2, ArrowLeft } from 'lucide-react';
+import { Package, DollarSign, Image as ImageIcon, Tag, Loader2, ArrowLeft, Truck } from 'lucide-react';
 import { apiFetch } from '../utils/api';
 
 const AddProduct = () => {
