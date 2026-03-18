@@ -13,6 +13,7 @@ const AddProduct = () => {
     description: '',
     price: '',
     stock: '',
+    shippingCost: '',
     image_url: '',
     category: 'Electronics'
   });
@@ -31,7 +32,8 @@ const AddProduct = () => {
         body: JSON.stringify({
           ...formData,
           price: parseFloat(formData.price),
-          stock: parseInt(formData.stock)
+          stock: parseInt(formData.stock),
+          shippingCost: formData.shippingCost ? parseFloat(formData.shippingCost) : undefined
         })
       });
 
@@ -105,6 +107,14 @@ const AddProduct = () => {
                   placeholder="10"
                 />
               </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-gray-700 px-1">Shipping Override (Optional)</label>
+              <div className="relative">
+                <Truck className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input type="number" value={formData.shippingCost} onChange={(e) => setFormData({ ...formData, shippingCost: e.target.value })} className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" placeholder="Add specific shipping cost" />
+              </div>
+              <p className="text-[10px] text-gray-400 px-1">Leave empty to use your Zone-based logistics settings.</p>
             </div>
           </div>
 

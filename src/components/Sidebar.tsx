@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Package, PlusCircle, ShoppingBag, BarChart2, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, PlusCircle, ShoppingBag, BarChart2, Settings } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Users, Truck } from 'lucide-react';
@@ -21,6 +21,7 @@ export const Sidebar = () => {
         { to: '/dashboard/products/add', icon: PlusCircle, label: 'Add Product' },
         { to: '/dashboard/orders', icon: ShoppingBag, label: 'Orders' },
         { to: '/dashboard/analytics', icon: BarChart2, label: 'Analytics' },
+        { to: '/dashboard/settings', icon: Settings, label: 'Settings' },
       ];
       break;
     case 'ADMIN':

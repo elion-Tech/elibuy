@@ -18,6 +18,7 @@ const Cart = () => {
   });
 
   const [shippingCost, setShippingCost] = useState(0);
+  const [isInternational, setIsInternational] = useState(false);
   const [loadingShippingCost, setLoadingShippingCost] = useState(false);
 
   const config = useMemo(() => ({
@@ -115,8 +116,9 @@ const Cart = () => {
 
   const calculateShipping = async () => {
     setLoadingShippingCost(true);
+    setIsInternational(false);
     try {
-      const res = await apiFetch('/api/shipping-cost', {
+      const res = await apiFetch('/api/orders/cost', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -129,7 +131,12 @@ const Cart = () => {
       });
       const data = await res.json();
       if (res.ok) {
-        setShippingCost(data.shippingCost);
+        if (data.isInternational) {
+          setIsInternational(true);
+          setShippingCost(0);
+        } else {
+          setShippingCost(data.shippingCost);
+        }
       } else {
         console.error('Failed to calculate shipping cost:', data.error);
         setShippingCost(0);
@@ -233,7 +240,11 @@ const Cart = () => {
             </div>
             <div className="flex justify-between text-gray-500">
               <span>Shipping</span>
-              <span className="text-emerald-600 font-bold">₦{shippingCost.toLocaleString()}</span>
+              {isInternational ? (
+                <span className="text-orange-600 font-bold text-xs text-right">International (Contact Vendor)</span>
+              ) : (
+                <span className="text-emerald-600 font-bold">₦{shippingCost.toLocaleString()}</span>
+              )}
             </div>
             <div className="border-t border-gray-50 pt-4 flex justify-between text-lg font-bold">
               <span>Total</span>

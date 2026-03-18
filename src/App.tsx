@@ -16,6 +16,7 @@ import ResetPassword from './pages/ResetPassword';
 import AddProduct from './pages/AddProduct';
 import EditProduct from './pages/EditProduct';
 import VendorProducts from './pages/VendorProducts';
+import VendorSettings from './pages/VendorSettings';
 
 const ProtectedRoute = ({ children, roles }: { children: React.ReactNode, roles?: string[] }) => {
   const { user, loading } = useAuth();
@@ -87,6 +88,12 @@ function App() {
               <Route path="/dashboard/analytics" element={
                 <ProtectedRoute roles={['VENDOR', 'ADMIN']}>
                   <Dashboard />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/dashboard/settings" element={
+                <ProtectedRoute roles={['VENDOR']}>
+                  <VendorSettings />
                 </ProtectedRoute>
               } />
 
