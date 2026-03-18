@@ -6,6 +6,47 @@ import { Link, useNavigate } from 'react-router-dom';
 import { usePaystackPayment } from 'react-paystack';
 import { apiFetch } from '../utils/api';
 
+const NIGERIAN_STATES = [
+  { name: 'Abia', capital: 'Umuahia' },
+  { name: 'Abuja', capital: 'FCT' },
+  { name: 'Adamawa', capital: 'Yola' },
+  { name: 'Akwa Ibom', capital: 'Uyo' },
+  { name: 'Anambra', capital: 'Awka' },
+  { name: 'Bauchi', capital: 'Bauchi' },
+  { name: 'Bayelsa', capital: 'Yenagoa' },
+  { name: 'Benue', capital: 'Makurdi' },
+  { name: 'Borno', capital: 'Maiduguri' },
+  { name: 'Cross River', capital: 'Calabar' },
+  { name: 'Delta', capital: 'Asaba' },
+  { name: 'Ebonyi', capital: 'Abakaliki' },
+  { name: 'Edo', capital: 'Benin City' },
+  { name: 'Ekiti', capital: 'Ado Ekiti' },
+  { name: 'Enugu', capital: 'Enugu' },
+  { name: 'Gombe', capital: 'Gombe' },
+  { name: 'Imo', capital: 'Owerri' },
+  { name: 'Jigawa', capital: 'Dutse' },
+  { name: 'Kaduna', capital: 'Kaduna' },
+  { name: 'Kano', capital: 'Kano' },
+  { name: 'Katsina', capital: 'Katsina' },
+  { name: 'Kebbi', capital: 'Birnin Kebbi' },
+  { name: 'Kogi', capital: 'Lokoja' },
+  { name: 'Kwara', capital: 'Ilorin' },
+  { name: 'Lagos', capital: 'Ikeja' },
+  { name: 'Nasarawa', capital: 'Lafia' },
+  { name: 'Niger', capital: 'Minna' },
+  { name: 'Ogun', capital: 'Abeokuta' },
+  { name: 'Ondo', capital: 'Akure' },
+  { name: 'Osun', capital: 'Osogbo' },
+  { name: 'Oyo', capital: 'Ibadan' },
+  { name: 'Plateau', capital: 'Jos' },
+  { name: 'Rivers', capital: 'Port Harcourt' },
+  { name: 'Sokoto', capital: 'Sokoto' },
+  { name: 'Taraba', capital: 'Jalingo' },
+  { name: 'Yobe', capital: 'Damaturu' },
+  { name: 'Zamfara', capital: 'Gusau' },
+  { name: 'International', capital: 'Worldwide' }
+];
+
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, total, clearCart } = useCart();
   const { user, token } = useAuth();
@@ -20,7 +61,7 @@ const Cart = () => {
   const [shippingCost, setShippingCost] = useState(0);
   const [isInternational, setIsInternational] = useState(false);
   const [loadingShippingCost, setLoadingShippingCost] = useState(false);
-  const [availableStates, setAvailableStates] = useState<string[]>([]);
+  const [availableStates] = useState(NIGERIAN_STATES);
 
   const config = useMemo(() => ({
     reference: (new Date()).getTime().toString(),
@@ -33,13 +74,6 @@ const Cart = () => {
     // Debounce or only calculate if state/lga are present to avoid initial empty calls
     if (shippingDetails.state && shippingDetails.lga) calculateShipping();
   }, [shippingDetails]);
-
-  useEffect(() => {
-    apiFetch('/api/orders/states')
-      .then((res) => res.json())
-      .then((data) => setAvailableStates(data))
-      .catch((err) => console.error("Failed to load states", err));
-  }, []);
 
   const initializePayment = usePaystackPayment(config);
 
@@ -223,7 +257,7 @@ const Cart = () => {
               <input type="text" list="state-suggestions" required value={shippingDetails.state} onChange={(e) => setShippingDetails({...shippingDetails, state: e.target.value})} className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" placeholder="Enter state" />
               <datalist id="state-suggestions">
                 {availableStates.map((s) => (
-                  <option key={s} value={s} />
+                  <option key={s.name} value={s.name}>{s.capital}</option>
                 ))}
               </datalist>
             </div>
