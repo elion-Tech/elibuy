@@ -104,7 +104,7 @@ const Cart = () => {
         },
         body: JSON.stringify({
           items: items.map(item => ({ ...item, product_id: item.id })),
-          total_amount: total,
+          total_amount: total + shippingCost,
           shippingDetails,
           payment_reference: reference.reference
         })
