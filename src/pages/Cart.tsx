@@ -66,7 +66,7 @@ const Cart = () => {
   const config = useMemo(() => ({
     reference: (new Date()).getTime().toString(),
     email: user?.email || '',
-    amount: (total + shippingCost) * 100, // Paystack expects amount in kobo
+    amount: Math.round((total + shippingCost) * 100), // Paystack expects amount in kobo
     publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_your_public_key',
   }), [user, total, shippingCost]);
 
@@ -153,7 +153,7 @@ const Cart = () => {
       return;
     }
 
-    initializePayment({ onSuccess, onClose });
+    initializePayment(onSuccess, onClose);
   };
 
   const calculateShipping = async () => {
