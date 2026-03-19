@@ -114,6 +114,9 @@ const Cart = () => {
         clearCart();
         navigate('/dashboard');
         alert('Payment Successful! Order placed.');
+      } else {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to create order');
       }
     } catch (err: any) {
       console.error(err);
@@ -181,6 +184,7 @@ const Cart = () => {
         }
       } else {
         console.error('Failed to calculate shipping cost:', data.error);
+        if (data.error) alert(data.error); // Alert the user (e.g., "Wrong state inputted")
         setShippingCost(0);
       }
     } catch (error) {

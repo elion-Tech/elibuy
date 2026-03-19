@@ -13,8 +13,12 @@ const VendorProducts = () => {
     apiFetch('/api/products')
       .then(res => res.json())
       .then(data => {
-        // Filter products for this vendor
-        const myProducts = data.filter((p: any) => p.vendor_id === user?.id);
+        // Filter products based on role
+        let myProducts = data;
+        if (user?.role !== 'ADMIN') {
+          myProducts = data.filter((p: any) => p.vendor_id === user?.id);
+        }
+        
         setProducts(myProducts);
         setLoading(false);
       });
