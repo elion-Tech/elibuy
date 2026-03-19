@@ -95,6 +95,8 @@ const Cart = () => {
         throw new Error('Payment verification failed');
       }
 
+      console.log('Payment verified, creating order...');
+
       // 2. Create order
       const res = await apiFetch('/api/orders', {
         method: 'POST',
