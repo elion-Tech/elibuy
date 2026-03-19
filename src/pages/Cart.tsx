@@ -70,11 +70,6 @@ const Cart = () => {
     publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_your_public_key',
   }), [user, total, shippingCost]);
 
-  useEffect(() => {
-    // Debounce or only calculate if state/lga are present to avoid initial empty calls
-    if (shippingDetails.state && shippingDetails.lga) calculateShipping();
-  }, [shippingDetails]);
-
   const initializePayment = usePaystackPayment(config);
 
   const onSuccess = async (reference: any) => {
@@ -260,7 +255,19 @@ const Cart = () => {
           <h3 className="text-xl font-bold text-gray-900">Shipping Details</h3>
            <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700 px-1">State</label>
-              <input type="text" list="state-suggestions" required value={shippingDetails.state} onChange={(e) => setShippingDetails({...shippingDetails, state: e.target.value})} className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" placeholder="Enter state" />
+              <input 
+                type="text" 
+                list="state-suggestions" 
+                required 
+                value={shippingDetails.state} 
+                onChange={(e) => {
+                  setShippingDetails({...shippingDetails, state: e.target.value});
+                  if (!e.target.value) setShippingCost(0);
+                }} 
+                onBlur={() => { if(shippingDetails.state) calculateShipping() }}
+                className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" 
+                placeholder="Enter state" 
+              />
               <datalist id="state-suggestions">
                 {availableStates.map((s) => (
                   <option key={s.name} value={s.name}>{s.capital}</option>
@@ -270,7 +277,18 @@ const Cart = () => {
 
              <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700 px-1">LGA</label>
-              <input type="text" required value={shippingDetails.lga} onChange={(e) => setShippingDetails({...shippingDetails, lga: e.target.value})} className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" placeholder="Enter LGA" />
+              <input 
+                type="text" 
+                required 
+                value={shippingDetails.lga} 
+                onChange={(e) => {
+                  setShippingDetails({...shippingDetails, lga: e.target.value});
+                  if (!e.target.value) setShippingCost(0);
+                }} 
+                onBlur={() => { if(shippingDetails.state && shippingDetails.lga) calculateShipping() }}
+                className="w-full pl-4 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-indigo-600 transition-all" 
+                placeholder="Enter LGA" 
+              />
             </div>
 
              <div className="space-y-2">

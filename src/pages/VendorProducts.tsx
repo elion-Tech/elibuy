@@ -8,6 +8,7 @@ const VendorProducts = () => {
   const { token, user } = useAuth();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     apiFetch('/api/products')
@@ -48,6 +49,11 @@ const VendorProducts = () => {
     }
   };
 
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (product.category || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) return <div className="p-10 text-center">Loading products...</div>;
 
   return (
@@ -71,8 +77,10 @@ const VendorProducts = () => {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input 
-              type="text" 
-              placeholder="Search your products..." 
+              type="search" 
+              placeholder="Search by name or category..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-600 focus:border-transparent"
             />
           </div>
@@ -90,7 +98,7 @@ const VendorProducts = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <tr key={product.id} className="group hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-4">
@@ -130,13 +138,21 @@ const VendorProducts = () => {
                   </td>
                 </tr>
               ))}
-              {products.length === 0 && (
+              {products.length > 0 && filteredProducts.length === 0 && (
                 <tr>
                   <td colSpan={5} className="py-20 text-center">
                     <div className="flex flex-col items-center gap-4">
-                      <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center">
-                        <Package className="w-8 h-8 text-gray-200" />
-                      </div>
+                      <Search className="w-12 h-12 text-gray-300" />
+                      <p className="text-gray-400 font-medium">No products match your search.</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {products.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={5} className="py-20 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <Package className="w-12 h-12 text-gray-300" />
                       <p className="text-gray-400 font-medium">No products found. Start by adding one!</p>
                     </div>
                   </td>
