@@ -62,13 +62,14 @@ const Cart = () => {
   const [isInternational, setIsInternational] = useState(false);
   const [loadingShippingCost, setLoadingShippingCost] = useState(false);
   const [availableStates] = useState(NIGERIAN_STATES);
+  const [retryCount, setRetryCount] = useState(0);
 
   const config = useMemo(() => ({
     reference: (new Date()).getTime().toString(),
     email: user?.email || '',
     amount: Math.round((total + shippingCost) * 100), // Paystack expects amount in kobo
-    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '',
-  }), [user, total, shippingCost]);
+    publicKey: (import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '').trim(),
+  }), [user, total, shippingCost, retryCount]);
 
   const initializePayment = usePaystackPayment(config);
 
@@ -138,6 +139,7 @@ const Cart = () => {
 
   const onClose = () => {
     alert('Payment cancelled.');
+    setRetryCount(prev => prev + 1); // Regenerate reference for next attempt
   };
 
   const handleCheckout = () => {
@@ -151,9 +153,7 @@ const Cart = () => {
     }
 
 
-    const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
-    if (!publicKey || publicKey === 'pk_test_your_public_key' || publicKey === '') {
-    
+    const publicKey = (import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '').trim();
     if (!publicKey || publicKey === '') {
       const proceed = confirm(
         "Paystack Public Key is not configured. \n\n" +
