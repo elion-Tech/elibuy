@@ -67,7 +67,7 @@ const Cart = () => {
     reference: (new Date()).getTime().toString(),
     email: user?.email || '',
     amount: Math.round((total + shippingCost) * 100), // Paystack expects amount in kobo
-    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_your_public_key',
+    publicKey: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || '',
   }), [user, total, shippingCost]);
 
   const initializePayment = usePaystackPayment(config);
@@ -153,6 +153,8 @@ const Cart = () => {
 
     const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY;
     if (!publicKey || publicKey === 'pk_test_your_public_key' || publicKey === '') {
+    
+    if (!publicKey || publicKey === '') {
       const proceed = confirm(
         "Paystack Public Key is not configured. \n\n" +
         "To use real payments, please set VITE_PAYSTACK_PUBLIC_KEY in your environment variables. \n\n" +
