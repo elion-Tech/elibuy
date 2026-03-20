@@ -91,6 +91,15 @@ const Cart = () => {
       }
 
       console.log('Payment verified, creating order...');
+      
+      const orderPayload = {
+        items: items.map(item => ({ ...item, product_id: item.id || (item as any)._id })),
+        total_amount: total + shippingCost,
+        shippingDetails,
+        payment_reference: reference.reference
+      };
+
+      console.log('Sending Order Payload:', orderPayload);
 
       // 2. Create order
       const res = await apiFetch('/api/orders', {
@@ -99,20 +108,18 @@ const Cart = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          items: items.map(item => ({ ...item, product_id: item.id || (item as any)._id })),
-          total_amount: total + shippingCost,
-          shippingDetails,
-          payment_reference: reference.reference
-        })
+        body: JSON.stringify(orderPayload)
       });
 
       if (res.ok) {
+        const responseData = await res.json();
+        console.log('Order created successfully:', responseData);
         clearCart();
         navigate('/dashboard');
         alert('Payment Successful! Order placed.');
       } else {
         const errorData = await res.json();
+        console.error('Order creation failed. Server response:', errorData);
         throw new Error(errorData.error || 'Failed to create order');
       }
     } catch (err: any) {
