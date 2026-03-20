@@ -104,7 +104,7 @@ const VendorProducts = () => {
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-4">
                       <img 
-                        src={product.image_url || `https://picsum.photos/seed/${product.id}/100/100`} 
+                        src={(product.image_url && product.image_url.startsWith('http')) ? product.image_url : `https://picsum.photos/seed/${product.id}/100/100`} 
                         alt="" 
                         className="w-12 h-12 rounded-lg object-cover"
                         referrerPolicy="no-referrer"

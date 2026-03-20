@@ -175,7 +175,7 @@ const Cart = () => {
         body: JSON.stringify({
           state: shippingDetails.state,
           lga: shippingDetails.lga,
-          items: items.map(item => ({ product_id: item.id, ...item })) // Send items for free shipping check
+          items: items.map(item => ({ product_id: item.id || (item as any)._id, ...item })) // Send items for free shipping check
         }),
       });
       const data = await res.json();
@@ -235,11 +235,11 @@ const Cart = () => {
                 <div className="flex items-center gap-3">
                   <p className="text-sm text-gray-500">Quantity:</p>
                   <div className="flex items-center gap-2 border border-gray-200 rounded-full">
-                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1.5 text-gray-400 hover:text-indigo-600">
+                    <button type="button" onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1.5 text-gray-400 hover:text-indigo-600">
                       <Minus className="w-3.5 h-3.5" />
                     </button>
                     <span className="text-sm font-bold w-4 text-center">{item.quantity}</span>
-                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1.5 text-gray-400 hover:text-indigo-600">
+                    <button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1.5 text-gray-400 hover:text-indigo-600">
                       <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -247,6 +247,7 @@ const Cart = () => {
                 <p className="text-indigo-600 font-bold">₦{item.price.toLocaleString()}</p>
               </div>
               <button 
+                type="button"
                 onClick={() => removeFromCart(item.id)}
                 className="p-2 text-gray-300 hover:text-red-500 transition-colors"
               >
@@ -304,7 +305,7 @@ const Cart = () => {
             </div>
         </div>
 
-        <button onClick={calculateShipping} className="w-full bg-gray-800 text-white py-3 rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-70">
+        <button type="button" onClick={calculateShipping} className="w-full bg-gray-800 text-white py-3 rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-70">
           {loadingShippingCost ? 'Calculating...' : 'Calculate Shipping'}
         </button>
 
@@ -331,6 +332,7 @@ const Cart = () => {
           </div>
 
           <button
+            type="button"
             onClick={handleCheckout}
             disabled={loading || !shippingDetails.streetAddress}
             className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2 disabled:opacity-70"

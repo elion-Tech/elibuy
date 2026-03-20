@@ -129,7 +129,7 @@ const Home = () => {
             >
               <div className="aspect-square bg-gray-50 relative overflow-hidden">
                 <img 
-                  src={product.image_url || `https://picsum.photos/seed/${product.id}/400/400`} 
+                  src={(product.image_url && product.image_url.startsWith('http')) ? product.image_url : `https://picsum.photos/seed/${product.id}/400/400`} 
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   referrerPolicy="no-referrer"
