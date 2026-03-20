@@ -86,6 +86,7 @@ const Cart = () => {
       });
 
       const verifyData = await verifyRes.json();
+      console.log('Payment Verification Response:', verifyData);
       if (!verifyRes.ok || verifyData.status !== 'success') {
         throw new Error('Payment verification failed');
       }
