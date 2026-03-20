@@ -87,6 +87,11 @@ const Cart = () => {
 
       const verifyData = await verifyRes.json();
       console.log('Payment Verification Response:', verifyData);
+
+      if (verifyRes.status === 404) {
+        throw new Error('Server API not found (404). Ensure backend is running and URL is correct.');
+      }
+
       if (!verifyRes.ok || verifyData.status !== 'success') {
         throw new Error('Payment verification failed');
       }
@@ -179,6 +184,9 @@ const Cart = () => {
           items: items.map(item => ({ product_id: item.id || (item as any)._id, ...item })) // Send items for free shipping check
         }),
       });
+      if (res.status === 404) {
+        console.error('Shipping calculation endpoint not found (404). Check backend URL.');
+      }
       const data = await res.json();
       if (res.ok) {
         if (data.isInternational) {
