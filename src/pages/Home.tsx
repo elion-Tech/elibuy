@@ -29,8 +29,9 @@ const Home = () => {
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
-          setProducts(data);
-          setFilteredProducts(data);
+          const productsWithId = data.map((p: any) => ({ ...p, id: p._id }));
+          setProducts(productsWithId);
+          setFilteredProducts(productsWithId);
         } else {
           console.error('Expected array of products, got:', data);
           setProducts([]);

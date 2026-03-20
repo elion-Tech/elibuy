@@ -14,11 +14,10 @@ const VendorProducts = () => {
     apiFetch('/api/products')
       .then(res => res.json())
       .then(data => {
+        const productsWithId = data.map((p: any) => ({ ...p, id: p._id }));
         // Filter products based on role
-        let myProducts = data;
-        if (user?.role !== 'ADMIN') {
-          myProducts = data.filter((p: any) => p.vendor_id === user?.id);
-        }
+        let myProducts = = 'ADMIN') {
+          myProducts = productsWithId
         
         setProducts(myProducts);
         setLoading(false);

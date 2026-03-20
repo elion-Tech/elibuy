@@ -100,7 +100,7 @@ const Cart = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          items: items.map(item => ({ ...item, product_id: item.id })),
+          items: items.map(item => ({ ...item, product_id: item.id || (item as any)._id })),
           total_amount: total + shippingCost,
           shippingDetails,
           payment_reference: reference.reference
