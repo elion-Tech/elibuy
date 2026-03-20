@@ -16,8 +16,10 @@ const VendorProducts = () => {
       .then(data => {
         const productsWithId = data.map((p: any) => ({ ...p, id: p._id }));
         // Filter products based on role
-        let myProducts = = 'ADMIN') {
-          myProducts = productsWithId
+        let myProducts = productsWithId;
+        if (user?.role !== 'ADMIN') {
+          myProducts = productsWithId.filter((p: any) => p.vendor_id === user?.id);
+        }
         
         setProducts(myProducts);
         setLoading(false);

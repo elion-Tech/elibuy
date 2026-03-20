@@ -218,7 +218,7 @@ const Cart = () => {
           {items.map((item) => (
             <div key={item.id} className="bg-white p-4 rounded-2xl border border-gray-100 flex gap-4 items-center">
               <img 
-                src={item.image_url || `https://picsum.photos/seed/${item.id}/200/200`} 
+                src={(item.image_url && item.image_url.startsWith('http')) ? item.image_url : `https://picsum.photos/seed/${item.id}/200/200`} 
                 alt={item.name} 
                 className="w-24 h-24 object-cover rounded-xl"
                 referrerPolicy="no-referrer"
