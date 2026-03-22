@@ -100,7 +100,15 @@ const Cart = () => {
       console.log('Payment verified, creating order...');
       
       const orderPayload = {
-        items: items.map(item => ({ ...item, product_id: item.id || (item as any)._id })),
+        items: items.map(item => ({
+          product_id: item.id || (item as any)._id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image_url: item.image_url,
+          vendor_id: (item as any).vendor_id,
+          category: (item as any).category
+        })),
         total_amount: total + shippingCost,
         shippingDetails,
         payment_reference: reference.reference
@@ -345,7 +353,7 @@ const Cart = () => {
           <button
             type="button"
             onClick={handleCheckout}
-            disabled={loading || !shippingDetails.streetAddress}
+            disabled={loading || !shippingDetails.streetAddress || !shippingDetails.state || !shippingDetails.lga}
             className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2 disabled:opacity-70"
           >
             {loading ? 'Processing...' : (
