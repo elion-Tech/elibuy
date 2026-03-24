@@ -80,7 +80,8 @@ const Cart = () => {
       
       const orderPayload = {
         shippingDetails,
-        payment_reference: reference.reference
+        payment_reference: reference.reference,
+        shipping_cost: shippingCost // Send this so backend can calculate total correctly
       };
 
       // This endpoint now verifies payment AND creates the order atomically.
@@ -102,7 +103,7 @@ const Cart = () => {
       } else {
         const errorData = await res.json();
         console.error('Order creation failed. Server response:', errorData);
-        throw new Error(errorData.error || 'Failed to create order');
+        throw new Error(errorData.error || `Server error: ${res.status}`);
       }
     } catch (err: any) {
       console.error(err);
