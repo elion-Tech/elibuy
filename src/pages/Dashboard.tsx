@@ -193,7 +193,7 @@ const OrderTable = ({ orders, setOrders, isLogistics }: { orders: any[], setOrde
           {orders.map((order) => (
             <tr key={order.id} className="group hover:bg-gray-50 transition-colors">
               <td className="py-4 px-4 font-bold text-gray-900">#ORD-{order.id}</td>
-              <td className="py-4 px-4 text-sm text-gray-500">{new Date(order.created_at).toLocaleDateString()}</td>
+              <td className="py-4 px-4 text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</td>
               <td className="py-4 px-4 font-bold text-indigo-600">₦{order.total_amount.toLocaleString()}</td>
               <td className="py-4 px-4">
                 <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${
@@ -207,7 +207,11 @@ const OrderTable = ({ orders, setOrders, isLogistics }: { orders: any[], setOrde
               </td>
 
               <td className="py-4 px-4 text-sm text-gray-500">
-                {order.shippingDetails?.streetAddress}, {order.shippingDetails?.lga}, {order.shippingDetails?.state}
+                {order.shippingDetails ? (
+                  <>{order.shippingDetails.streetAddress}, {order.shippingDetails.lga}, {order.shippingDetails.state}</>
+                ) : (
+                  <span className="text-gray-400">N/A</span>
+                )}
               </td>
               {isLogistics && (
                 <td className="py-4 px-4">
