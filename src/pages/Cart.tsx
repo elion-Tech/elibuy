@@ -101,9 +101,17 @@ const Cart = () => {
         navigate('/dashboard');
         alert('Payment Successful! Order placed.');
       } else {
-        const errorData = await res.json();
-        console.error('Order creation failed. Server response:', errorData);
-        throw new Error(errorData.error || `Server error: ${res.status}`);
+        let errorMessage = `Server error: ${res.status}`;
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.error || errorMessage;
+          console.error('Order creation failed. Server response:', errorData);
+        } catch (e) {
+          console.error('Order creation failed. Could not parse JSON response:', res);
+          const text = await res.text();
+          console.error('Raw response:', text);
+        }
+        throw new Error(errorMessage);
       }
     } catch (err: any) {
       console.error(err);
