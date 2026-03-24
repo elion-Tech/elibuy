@@ -76,37 +76,14 @@ const Cart = () => {
   const onSuccess = async (reference: any) => {
     setLoading(true);
     try {
-      // 1. Verify payment on backend
-      const verifyRes = await apiFetch('/api/orders/verify', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ reference: reference.reference })
-      });
-
-      const verifyData = await verifyRes.json();
-      console.log('Payment Verification Response:', verifyData);
-
-      if (verifyRes.status === 404) {
-        throw new Error('Server API not found (404). Ensure backend is running and URL is correct.');
-      }
-
-      if (!verifyRes.ok || verifyData.status !== 'success') {
-        throw new Error('Payment verification failed');
-      }
-
-      console.log('Payment verified, creating order...');
+      console.log('Payment successful, creating order...');
       
       const orderPayload = {
         shippingDetails,
         payment_reference: reference.reference
       };
 
-      console.log('Sending Order Payload:', orderPayload);
-
-      // 2. Create order from server-side cart
+      // This endpoint now verifies payment AND creates the order atomically.
       const res = await apiFetch('/api/orders/from-cart', {
         method: 'POST',
         headers: { 
