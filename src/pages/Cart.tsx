@@ -48,7 +48,7 @@ const NIGERIAN_STATES = [
 ];
 
 const Cart = () => {
-  const { items, removeFromCart, updateQuantity, total, clearCart } = useCart();
+  const { items, removeFromCart, updateQuantity, total, clearCart, loading: cartLoading, error: cartError } = useCart();
   const { user, token } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -100,24 +100,14 @@ const Cart = () => {
       console.log('Payment verified, creating order...');
       
       const orderPayload = {
-        items: items.map(item => ({
-          product_id: item.id || (item as any)._id,
-          name: item.name,
-          price: item.price,
-          quantity: item.quantity,
-          image_url: item.image_url,
-          vendor_id: (item as any).vendor_id,
-          category: (item as any).category
-        })),
-        total_amount: total + shippingCost,
         shippingDetails,
         payment_reference: reference.reference
       };
 
       console.log('Sending Order Payload:', orderPayload);
 
-      // 2. Create order
-      const res = await apiFetch('/api/orders', {
+      // 2. Create order from server-side cart
+      const res = await apiFetch('/api/orders/from-cart', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -218,6 +208,26 @@ const Cart = () => {
     }
   };
 
+  if (cartLoading && items.length === 0) { // Show loading only on initial load
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-bold text-gray-900">Loading your cart...</h2>
+      </div>
+    );
+  }
+
+  if (cartError) {
+    return (
+      <div className="text-center py-20 space-y-4">
+        <h2 className="text-2xl font-bold text-red-600">Error loading cart</h2>
+        <p className="text-gray-500">{cartError}</p>
+        <button onClick={() => window.location.reload()} className="inline-block bg-indigo-600 text-white px-8 py-4 rounded-full font-bold hover:bg-indigo-700 transition-all">
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
   if (items.length === 0) {
     return (
       <div className="text-center py-20 space-y-6">
@@ -254,11 +264,11 @@ const Cart = () => {
                 <div className="flex items-center gap-3">
                   <p className="text-sm text-gray-500">Quantity:</p>
                   <div className="flex items-center gap-2 border border-gray-200 rounded-full">
-                    <button type="button" onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1.5 text-gray-400 hover:text-indigo-600">
+                    <button type="button" onClick={() => updateQuantity(item.id, item.quantity - 1)} className="p-1.5 text-gray-400 hover:text-indigo-600" disabled={cartLoading}>
                       <Minus className="w-3.5 h-3.5" />
                     </button>
                     <span className="text-sm font-bold w-4 text-center">{item.quantity}</span>
-                    <button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1.5 text-gray-400 hover:text-indigo-600">
+                    <button type="button" onClick={() => updateQuantity(item.id, item.quantity + 1)} className="p-1.5 text-gray-400 hover:text-indigo-600" disabled={cartLoading}>
                       <Plus className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -268,7 +278,7 @@ const Cart = () => {
               <button 
                 type="button"
                 onClick={() => removeFromCart(item.id)}
-                className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+                className="p-2 text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50" disabled={cartLoading}
               >
                 <Trash2 className="w-5 h-5" />
               </button>
@@ -353,7 +363,7 @@ const Cart = () => {
           <button
             type="button"
             onClick={handleCheckout}
-            disabled={loading || !shippingDetails.streetAddress || !shippingDetails.state || !shippingDetails.lga}
+            disabled={loading || cartLoading || !shippingDetails.streetAddress || !shippingDetails.state || !shippingDetails.lga}
             className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2 disabled:opacity-70"
           >
             {loading ? 'Processing...' : (
