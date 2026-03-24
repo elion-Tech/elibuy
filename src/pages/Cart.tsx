@@ -99,7 +99,7 @@ const Cart = () => {
         console.log('Order created successfully:', responseData);
         clearCart();
         navigate('/dashboard');
-        alert('Payment Successful! Order placed.');
+        alert(`Payment Successful! Order placed.\nOrder ID: ${responseData.orderId}`);
       } else {
         let errorMessage = `Server error: ${res.status}`;
         try {
