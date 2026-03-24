@@ -81,16 +81,15 @@ const Cart = () => {
       const orderPayload = {
         shippingDetails,
         payment_reference: reference.reference,
-        shipping_cost: shippingCost // Send this so backend can calculate total correctly
+        // shipping_cost is now calculated on backend for security, 
+        // but passing it for logging/debugging is harmless.
+        expected_shipping_cost: shippingCost 
       };
 
-      // This endpoint now verifies payment AND creates the order atomically.
-      const res = await apiFetch('/api/orders/from-cart', {
+      // Use the standard REST endpoint
+      const res = await apiFetch('/api/orders', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(orderPayload)
       });
 
