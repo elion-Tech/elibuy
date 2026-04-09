@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck, Plus, Minus } from 'lucide-react';
+import { Trash2, ShoppingBag, ArrowRight, ShieldCheck, Truck, Plus, Minus, MapPin, Phone } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePaystackPayment } from 'react-paystack';
 import { apiFetch } from '../utils/api';
@@ -13,6 +13,24 @@ const Cart = () => {
   const [loading, setLoading] = useState(false);
 
   const [retryCount, setRetryCount] = useState(0);
+  
+  const [shippingDetails, setShippingDetails] = useState({
+    streetAddress: '',
+    city: '',
+    state: '',
+    lga: '',
+    phoneNumber: ''
+  });
+
+  const isShippingValid = useMemo(() => {
+    return (
+      shippingDetails.streetAddress.trim() !== '' &&
+      shippingDetails.city.trim() !== '' &&
+      shippingDetails.state.trim() !== '' &&
+      shippingDetails.lga.trim() !== '' &&
+      shippingDetails.phoneNumber.trim() !== ''
+    );
+  }, [shippingDetails]);
 
   const config = useMemo(() => ({
     reference: (new Date()).getTime().toString(),
@@ -30,6 +48,7 @@ const Cart = () => {
       
       const orderPayload = {
         payment_reference: reference.reference,
+        shippingDetails: shippingDetails
       };
 
       // Use the dedicated REST endpoint we've been using
@@ -141,6 +160,54 @@ const Cart = () => {
       <div className="lg:col-span-2 space-y-8">
         <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
         
+        {/* Shipping Form */}
+        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-indigo-600" />
+            Shipping Information
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <input
+                type="text"
+                placeholder="Street Address"
+                className="w-full p-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-600 transition-all text-sm"
+                value={shippingDetails.streetAddress}
+                onChange={(e) => setShippingDetails({ ...shippingDetails, streetAddress: e.target.value })}
+              />
+            </div>
+            <input
+              type="text"
+              placeholder="City"
+              className="p-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-600 transition-all text-sm"
+              value={shippingDetails.city}
+              onChange={(e) => setShippingDetails({ ...shippingDetails, city: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="Phone Number"
+              className="p-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-600 transition-all text-sm"
+              value={shippingDetails.phoneNumber}
+              onChange={(e) => setShippingDetails({ ...shippingDetails, phoneNumber: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="State"
+              className="p-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-600 transition-all text-sm"
+              value={shippingDetails.state}
+              onChange={(e) => setShippingDetails({ ...shippingDetails, state: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="LGA"
+              className="p-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-600 transition-all text-sm"
+              value={shippingDetails.lga}
+              onChange={(e) => setShippingDetails({ ...shippingDetails, lga: e.target.value })}
+            />
+          </div>
+          {!isShippingValid && <p className="text-[10px] text-amber-600 font-medium">* Please provide all shipping details to proceed.</p>}
+        </div>
+
         <div className="space-y-4">
           {items.map((item) => (
             <div key={item.id} className="bg-white p-4 rounded-2xl border border-gray-100 flex gap-4 items-center">
@@ -196,7 +263,7 @@ const Cart = () => {
           <button
             type="button"
             onClick={handleCheckout}
-            disabled={loading || cartLoading}
+            disabled={loading || cartLoading || !isShippingValid}
             className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-900/20 flex items-center justify-center gap-2 disabled:opacity-70"
           >
             {loading ? 'Processing...' : (
