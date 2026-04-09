@@ -21,9 +21,11 @@ interface Order {
   createdAt: string;
   items: OrderItem[];
   shippingDetails: {
-    address?: string;
+    streetAddress?: string;
     city?: string;
-    phone?: string;
+    state?: string;
+    lga?: string;
+    phoneNumber?: string;
   };
   payment_reference: string;
 }
@@ -139,14 +141,16 @@ const OrderDetails = () => {
               <div className="flex gap-3">
                 <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
                 <p className="text-gray-600">
-                  {order.shippingDetails?.address || 'No address provided'}
+                  {order.shippingDetails?.streetAddress || 'No address provided'}
                   <br />
-                  {order.shippingDetails?.city || ''}
+                  {order.shippingDetails?.lga ? `${order.shippingDetails.lga}, ` : 'N/A, '}
+                  {order.shippingDetails?.city ? `${order.shippingDetails.city}, ` : ''}
+                  {order.shippingDetails?.state || 'N/A'}
                 </p>
               </div>
               <div className="flex gap-3">
                 <Truck className="w-4 h-4 text-gray-400 shrink-0" />
-                <p className="text-gray-600">{order.shippingDetails?.phone || 'No phone provided'}</p>
+                <p className="text-gray-600">{order.shippingDetails?.phoneNumber || 'No phone provided'}</p>
               </div>
             </div>
           </div>
