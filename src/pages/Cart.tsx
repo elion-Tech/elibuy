@@ -19,16 +19,15 @@ const Cart = () => {
     city: '',
     state: '',
     lga: '',
-    phoneNumber: ''
+    phoneNumber: '' // Required by Mongoose Schema
   });
 
   const isShippingValid = useMemo(() => {
     return (
       shippingDetails.streetAddress.trim() !== '' &&
-      shippingDetails.city.trim() !== '' &&
       shippingDetails.state.trim() !== '' &&
       shippingDetails.lga.trim() !== '' &&
-      shippingDetails.phoneNumber.trim() !== ''
+      shippingDetails.phoneNumber.trim().length >= 10 // Basic length check
     );
   }, [shippingDetails]);
 
