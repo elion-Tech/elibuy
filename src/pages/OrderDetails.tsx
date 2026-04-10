@@ -25,7 +25,8 @@ interface Order {
     city?: string;
     state?: string;
     lga?: string;
-    phoneNumber
+    phoneNumber: string;
+  };
   payment_reference: string;
 }
 
